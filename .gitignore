@@ -1,0 +1,54 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.secret
+secrets/
+
+# Local databases and generated lab state
+instance/
+backend/instance/
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Python
+.venv/
+backend/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+backend/.pytest_cache/
+backend/.pytest-tmp/
+
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+*.tsbuildinfo
+
+# Tooling and local evidence
+.impeccable/
+.playwright-mcp/
+playwright-report/
+test-results/
+coverage/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

@@ -1,0 +1,30 @@
+# Environment and secrets
+.env
+.env.*
+!.env.local.example
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.secret
+secrets/
+
+# Dependencies and build output
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Test and tooling output
+coverage/
+playwright-report/
+test-results/
+.playwright-mcp/
+
+# Logs and local output
+*.log
+*.tmp
