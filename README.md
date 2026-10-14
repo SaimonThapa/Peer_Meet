@@ -510,6 +510,10 @@ Do not commit:
 
 The `.gitignore` files at the root, backend, and frontend levels are set up to help with this.
 
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
+
 ## Key Documentation Files
 
 Read these files for deeper project details:
