@@ -3,7 +3,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { AppShell } from "@/layouts/AppShell";
 
 export const metadata = {
-  title: "Social Security Lab",
+  title: "Peer Meet",
   description: "CSC 489 educational social media security capstone"
 };
 

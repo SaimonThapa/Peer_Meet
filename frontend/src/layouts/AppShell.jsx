@@ -20,7 +20,7 @@ export function AppShell({ children }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[var(--sidebar-width)_1fr]">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-[var(--sidebar-width)] border-r border-border bg-surface px-5 py-6 lg:block">
-        <Link href="/" className="block text-xl font-black tracking-normal">Social Security Lab</Link>
+        <Link href="/" className="block text-xl font-black tracking-normal">Peer Meet</Link>
         <nav className="mt-8 space-y-2" aria-label="Primary">
           {items.map((item) => <NavItem key={item.href} item={item} active={pathname === item.href} />)}
         </nav>
@@ -35,7 +35,7 @@ export function AppShell({ children }) {
       </aside>
       <header className="sticky top-0 z-10 border-b border-border bg-surface/95 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between">
-          <Link href="/" className="font-black">Social Security Lab</Link>
+          <Link href="/" className="font-black">Peer Meet</Link>
           {status === "authenticated" ? <span className="text-sm text-muted">@{user.username}</span> : <Link className="text-sm font-semibold text-primary" href="/login">Sign in</Link>}
         </div>
       </header>
