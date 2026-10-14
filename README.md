@@ -1,4 +1,4 @@
-# CSC 489 Social Media Security Lab
+# CSC 489 Social Media Security Lab - Peer Meet
 
 This repository contains an Instagram-inspired social media web application for the CSC 489 web security capstone. It is a local educational lab, not a production website. The app is meant to work like a small social network while also containing a limited set of intentional security weaknesses for classroom demonstration.
 
