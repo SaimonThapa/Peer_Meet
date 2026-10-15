@@ -30,7 +30,7 @@ export function AppShell({ children }) {
               <p className="text-sm text-muted">@{user.username}</p>
               <Button variant="ghost" className="w-full border border-border" onClick={logout}>Log out</Button>
             </div>
-          ) : <Link className="text-sm font-semibold text-primary" href="/login">Sign in</Link>}
+          ) : <Link className="block w-full text-sm font-semibold text-primary text-center" href="/login">Sign in</Link>}
         </div>
       </aside>
       <header className="sticky top-0 z-10 border-b border-border bg-surface/95 px-4 py-3 backdrop-blur lg:hidden">
