@@ -31,3 +31,7 @@ __pycache__/
 *.log
 *.tmp
 coverage/
+
+#Ignore md flies
+*.[mM][dD]
+doc

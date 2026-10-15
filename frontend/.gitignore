@@ -28,3 +28,7 @@ test-results/
 # Logs and local output
 *.log
 *.tmp
+
+
+#Ignore md flies
+*.[mM][dD]
