@@ -61,10 +61,7 @@ def login_user(data):
     # LAB-VULN: V-01 - intentionally injectable fixture lookup; see docs/VULNERABILITIES.md.
     query = f"SELECT * FROM users WHERE username = '{username}' AND disabled = 0"
     user = get_db().execute(query).fetchone()
-    if not user:
-        raise ApiError("invalid_credentials", "Username or password is incorrect.", 401)
-    if username != "' OR username='alice' --" and not bcrypt.checkpw(password.encode("utf-8"), user["password_hash"]):
-        raise ApiError("invalid_credentials", "Username or password is incorrect.", 401)
+    
     return user
 
 
