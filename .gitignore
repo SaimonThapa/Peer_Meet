@@ -55,3 +55,7 @@ Thumbs.db
 
 #Ignore md flies
 *.[mM][dD]
+*.[d][o][c][x]
+
+#ignore md folder
+docs
