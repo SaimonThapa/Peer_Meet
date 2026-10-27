@@ -1,8 +1,24 @@
-from flask import g
+from flask import current_app, g
 
 from app.config.database import get_db
 from app.models.serializers import post_public, user_public
 from app.schemas.errors import ApiError
+
+ALLOWED_IMAGE_MIME_TYPES = {"image/png", "image/jpeg", "image/gif", "image/webp"}
+
+
+def _looks_like_image(data):
+    if len(data) < 12:
+        return False
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        return True
+    if data.startswith(b"\xff\xd8\xff"):
+        return True
+    if data.startswith((b"GIF87a", b"GIF89a")):
+        return True
+    if data.startswith(b"RIFF") and data[8:12] == b"WEBP":
+        return True
+    return False
 
 
 def feed(limit=20):
@@ -64,8 +80,14 @@ def create_post(user, file_storage, caption):
     data = file_storage.read()
     if not data:
         raise ApiError("validation_error", "Uploaded file is empty.", 422)
-    # LAB-VULN: V-07A/V-07B - no app-level type or normal size validation; see docs/VULNERABILITIES.md.
+
     mime_type = file_storage.mimetype or "application/octet-stream"
+    if mime_type not in ALLOWED_IMAGE_MIME_TYPES or not _looks_like_image(data):
+        raise ApiError("validation_error", "Only PNG, JPEG, GIF, or WEBP images are supported.", 422)
+    max_bytes = current_app.config.get("MAX_CONTENT_LENGTH") or (12 * 1024 * 1024)
+    if len(data) > max_bytes:
+        raise ApiError("validation_error", "The uploaded image is too large.", 413)
+
     conn = get_db()
     image_id = conn.execute(
         "INSERT INTO images (owner_id, binary_data, mime_type, byte_size) VALUES (?, ?, ?, ?)",
@@ -113,10 +135,10 @@ def toggle_like(user, post_id):
 
 
 def add_comment(user, post_id, body):
-    if not (body or "").strip():
+    content = (body or "").strip()
+    if not content:
         raise ApiError("validation_error", "Comment cannot be empty.", 422)
-    # LAB-VULN: V-02A - raw comment body is stored for the approved frontend HTML sink.
-    get_db().execute("INSERT INTO comments (post_id, author_id, body) VALUES (?, ?, ?)", (post_id, user["id"], body))
+    get_db().execute("INSERT INTO comments (post_id, author_id, body) VALUES (?, ?, ?)", (post_id, user["id"], content))
     get_db().commit()
     return get_post(post_id)
 
@@ -155,11 +177,16 @@ def profile(username, viewer_id=0):
     return data
 
 
-def update_profile(target_id, fields):
+def update_profile(target_id, fields, current_user=None):
+    if current_user is None:
+        raise ApiError("forbidden", "You must be signed in to change a profile.", 403)
+    if target_id != current_user["id"] and current_user["role"] != "admin":
+        raise ApiError("forbidden", "You can only edit your own public profile.", 403)
+
     allowed = {k: fields[k] for k in ["displayName", "bio"] if k in fields}
     if not allowed:
         raise ApiError("validation_error", "No public profile fields were supplied.", 422)
-    # LAB-VULN: V-05 - target ID is not checked against current user; public fields only.
+
     get_db().execute(
         "UPDATE users SET display_name = COALESCE(?, display_name), bio = COALESCE(?, bio), updated_at = CURRENT_TIMESTAMP WHERE id = ?",
         (allowed.get("displayName"), allowed.get("bio"), target_id),

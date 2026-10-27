@@ -73,8 +73,7 @@ export function PostCard({ post, currentUser, onChanged, detail = false }) {
             {post.comments?.length ? post.comments.map((comment) => (
               <div key={comment.id} className="rounded-ui bg-elevated px-3 py-2 text-sm">
                 <span className="font-semibold">@{comment.author.username} </span>
-                {/* LAB-VULN: V-02A - approved stored XSS sink; see docs/VULNERABILITIES.md. */}
-                <span dangerouslySetInnerHTML={{ __html: comment.body }} />
+                <span>{comment.body}</span>
               </div>
             )) : <p className="text-sm text-muted">No comments yet.</p>}
             {currentUser && (

@@ -56,12 +56,24 @@ def register_user(data):
 
 
 def login_user(data):
-    username = data.get("username") or ""
+    username = (data.get("username") or "").strip()
     password = data.get("password") or ""
-    # LAB-VULN: V-01 - intentionally injectable fixture lookup; see docs/VULNERABILITIES.md.
-    query = f"SELECT * FROM users WHERE username = '{username}' AND disabled = 0"
-    user = get_db().execute(query).fetchone()
-    
+    if not username or not password:
+        raise ApiError("unauthenticated", "Invalid username or password.", 401)
+
+    user = get_db().execute(
+        "SELECT * FROM users WHERE username = ? AND disabled = 0",
+        (username,),
+    ).fetchone()
+    if not user:
+        raise ApiError("unauthenticated", "Invalid username or password.", 401)
+
+    try:
+        if not bcrypt.checkpw(password.encode("utf-8"), user["password_hash"]):
+            raise ApiError("unauthenticated", "Invalid username or password.", 401)
+    except ValueError as exc:
+        raise ApiError("unauthenticated", "Invalid username or password.", 401) from exc
+
     return user
 
 

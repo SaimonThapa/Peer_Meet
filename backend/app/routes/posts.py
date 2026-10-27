@@ -1,6 +1,7 @@
 from flask import Blueprint, g, request
 
 from app.auth.decorators import current_user_from_cookie, login_required
+from app.auth.tokens import validate_csrf_token
 from app.controllers.social_controller import add_comment, create_post, delete_comment, delete_post, feed, get_post, toggle_like, update_post
 
 bp = Blueprint("posts", __name__)
@@ -17,6 +18,7 @@ def list_posts():
 @bp.post("/posts")
 @login_required
 def create():
+    validate_csrf_token()
     return create_post(g.current_user, request.files.get("image"), request.form.get("caption")), 201
 
 
@@ -31,12 +33,14 @@ def detail(post_id):
 @bp.patch("/posts/<int:post_id>")
 @login_required
 def edit(post_id):
+    validate_csrf_token()
     return {"post": update_post(g.current_user, post_id, (request.get_json(silent=True) or {}).get("caption"))}
 
 
 @bp.delete("/posts/<int:post_id>")
 @login_required
 def remove(post_id):
+    validate_csrf_token()
     delete_post(g.current_user, post_id)
     return "", 204
 
@@ -44,17 +48,20 @@ def remove(post_id):
 @bp.post("/posts/<int:post_id>/likes")
 @login_required
 def like(post_id):
+    validate_csrf_token()
     return toggle_like(g.current_user, post_id)
 
 
 @bp.post("/posts/<int:post_id>/comments")
 @login_required
 def comment(post_id):
+    validate_csrf_token()
     return {"post": add_comment(g.current_user, post_id, (request.get_json(silent=True) or {}).get("body"))}
 
 
 @bp.delete("/comments/<int:comment_id>")
 @login_required
 def remove_comment(comment_id):
+    validate_csrf_token()
     delete_comment(g.current_user, comment_id)
     return "", 204

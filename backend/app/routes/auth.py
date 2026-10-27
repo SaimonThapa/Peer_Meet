@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request
 
 from app.auth.decorators import current_user_from_cookie, login_required
-from app.auth.tokens import clear_auth_cookies, set_auth_cookies
+from app.auth.tokens import clear_auth_cookies, set_auth_cookies, validate_csrf_token
 from app.controllers.auth_controller import create_auth_payload, login_user, register_user, revoke_refresh, rotate_refresh
 from app.schemas.errors import ApiError
 
@@ -28,6 +28,7 @@ def login():
 
 @bp.post("/refresh")
 def refresh():
+    validate_csrf_token()
     token = request.cookies.get("refresh_token")
     if not token:
         raise ApiError("unauthenticated", "Refresh session is missing.", 401)
@@ -39,6 +40,7 @@ def refresh():
 
 @bp.post("/logout")
 def logout():
+    validate_csrf_token()
     revoke_refresh(request.cookies.get("refresh_token"))
     response = make_response(jsonify({"ok": True}))
     clear_auth_cookies(response)

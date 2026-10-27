@@ -56,6 +56,14 @@ Thumbs.db
 #Ignore md flies
 *.[mM][dD]
 *.[d][o][c][x]
+*.pdf
 
 #ignore md folder
 docs
+
+# Publish only the application folders and required repository metadata.
+/*
+!/backend/
+!/frontend/
+!/LICENSE
+!/.gitignore

@@ -35,8 +35,7 @@ function SearchBody() {
       </form>
       {q && (
         <h1 className="text-2xl font-black">
-          Results for {/* LAB-VULN: V-02B - approved reflected XSS sink; see docs/VULNERABILITIES.md. */}
-          <span dangerouslySetInnerHTML={{ __html: q }} />
+          Results for <span>{q}</span>
         </h1>
       )}
       <ErrorMessage>{error}</ErrorMessage>

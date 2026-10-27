@@ -5,6 +5,12 @@ export class AuthenticationError extends Error {}
 let refreshPromise = null;
 let onAuthFailure = null;
 
+function readCookie(name) {
+  if (typeof document === "undefined") return "";
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
 export function setAuthFailureHandler(handler) {
   onAuthFailure = handler;
 }
@@ -37,12 +43,20 @@ async function refreshAuth() {
 
 export async function apiFetch(path, options = {}) {
   const skipRefresh = options.skipRefresh || path.includes("/auth/refresh") || path.includes("/auth/login") || path.includes("/auth/register");
+  const method = (options.method || "GET").toUpperCase();
+  const headers = { ...(options.headers || {}) };
+
+  if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+    const csrfToken = readCookie("csrf_token");
+    if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
+  }
+
   const request = {
     ...options,
     credentials: "include",
-    headers: options.body instanceof FormData ? options.headers : {
+    headers: options.body instanceof FormData ? headers : {
       "Content-Type": "application/json",
-      ...(options.headers || {})
+      ...headers
     }
   };
   delete request.skipRefresh;

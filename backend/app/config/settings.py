@@ -1,4 +1,5 @@
 import os
+import secrets
 from datetime import timedelta
 from pathlib import Path
 
@@ -9,8 +10,8 @@ load_dotenv()
 
 class Settings:
     BASE_DIR = Path(__file__).resolve().parents[2]
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-local-only")
-    JWT_SECRET = os.getenv("JWT_SECRET", "dev-jwt-secret-local-only")
+    SECRET_KEY = os.getenv("SECRET_KEY") or secrets.token_hex(32)
+    JWT_SECRET = os.getenv("JWT_SECRET") or secrets.token_hex(32)
     JWT_ALGORITHM = "HS256"
     ACCESS_TOKEN_SECONDS = int(os.getenv("ACCESS_TOKEN_SECONDS", "900"))
     REFRESH_TOKEN_SECONDS = int(os.getenv("REFRESH_TOKEN_SECONDS", str(7 * 24 * 60 * 60)))

@@ -1,9 +1,12 @@
 import hashlib
+import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from flask import current_app
+from flask import current_app, request
+
+from app.schemas.errors import ApiError
 
 
 def now_utc():
@@ -62,8 +65,28 @@ def set_auth_cookies(response, access_token, refresh_token):
         max_age=current_app.config["REFRESH_TOKEN_SECONDS"],
         path="/api/v1/auth",
     )
+    response.set_cookie(
+        "csrf_token",
+        secrets.token_urlsafe(32),
+        httponly=False,
+        samesite=current_app.config["SESSION_COOKIE_SAMESITE"],
+        secure=current_app.config["SESSION_COOKIE_SECURE"],
+        max_age=current_app.config["ACCESS_TOKEN_SECONDS"],
+        path="/",
+    )
 
 
 def clear_auth_cookies(response):
     response.delete_cookie("access_token", path="/")
     response.delete_cookie("refresh_token", path="/api/v1/auth")
+    response.delete_cookie("csrf_token", path="/")
+
+
+def validate_csrf_token():
+    if request.method in {"GET", "HEAD", "OPTIONS"}:
+        return
+
+    token = request.headers.get("X-CSRF-Token") or request.form.get("csrf_token")
+    cookie_token = request.cookies.get("csrf_token")
+    if not token or not cookie_token or not secrets.compare_digest(token, cookie_token):
+        raise ApiError("forbidden", "CSRF validation failed.", 403)
